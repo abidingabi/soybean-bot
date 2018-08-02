@@ -1,7 +1,7 @@
 import discord # This is the only external library required, pip install discord.py
 import asyncio
 from recipe_retrieval import get_recipe
-
+from data_retrieval import get_recipe_from_query
 
 token_file = open("discord_token.key", "r")
 
@@ -23,8 +23,17 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.lower().startswith('!soybean'):
+    if message.content.lower() == "!soybean":
         msg = get_recipe()
-        await client.send_message(message.channel, msg)
+    elif message.content.lower().startswith("!soybean"):
+        try:
+            query = message.content.lower().split(" ")[1]
+            msg = get_recipe_from_query(query)
+        except IndexError:
+           msg = get_recipe() 
+    else:
+        return
+    
+    await client.send_message(message.channel, msg)
 
 client.run(token)
